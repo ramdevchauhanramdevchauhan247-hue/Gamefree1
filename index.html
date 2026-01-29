@@ -1,0 +1,797 @@
+<DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Google Play - Premium Store</title>
+    <meta name="theme-color" content="#131314">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Google+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- EmailJS & TinyMCE -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script src="https://cdn.tiny.cloud/1/ble5aqz17uff67rfhg60xd7zs8cfcwutdo56py3d9k0kmzum/tinymce/8/tinymce.min.js" referrerpolicy="origin" crossorigin="anonymous"></script>
+
+    <style>
+        /* --- ORIGINAL THEME --- */
+        :root {
+            --bg: #131314; --surface: #1E1F21; --surface-light: #303033;
+            --primary: #8AB4F8; --accent: #00897B; --text: #E3E3E3;
+            --text-muted: #9AA0A6; --border: #3C4043;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Roboto', sans-serif; background: var(--bg); color: var(--text); padding-bottom: 80px; overflow-x: hidden; }
+
+        /* --- HEADER --- */
+        header {
+            position: sticky; top: 0; background: var(--bg); z-index: 100;
+            padding: 12px 16px; display: flex; align-items: center; gap: 15px;
+            box-shadow: 0 1px 0 rgba(255,255,255,0.1);
+        }
+        .search-bar {
+            flex: 1; background: var(--surface-light); height: 48px; border-radius: 24px;
+            display: flex; align-items: center; padding: 0 15px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+        .search-icon { width: 20px; height: 20px; fill: var(--text-muted); }
+        .search-inp {
+            background: transparent; border: none; outline: none; width: 100%;
+            color: var(--text); font-size: 1rem; margin-left: 10px;
+        }
+        .header-profile { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; cursor: pointer; }
+        .header-initial { width: 36px; height: 36px; border-radius: 50%; background: #5F6368; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; font-family: 'Google Sans'; }
+
+        /* --- TABS --- */
+        .tabs { display: flex; gap: 20px; padding: 10px 16px; border-bottom: 1px solid var(--border); overflow-x: auto; white-space: nowrap; scrollbar-width: none; }
+        .tab { font-family: 'Google Sans'; font-size: 0.95rem; color: var(--text-muted); font-weight: 500; cursor: pointer; position: relative; }
+        .tab.active { color: var(--primary); }
+        .tab.active::after { content: ''; position: absolute; bottom: -11px; left: 0; width: 100%; height: 3px; background: var(--primary); border-radius: 3px 3px 0 0; }
+
+        /* --- FEATURED --- */
+        .featured-scroll { display: flex; gap: 15px; overflow-x: auto; padding: 20px 16px; scrollbar-width: none; }
+        .feat-card { min-width: 250px; background: var(--surface); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+        .feat-img { width: 100%; height: 140px; object-fit: cover; }
+        .feat-info { padding: 12px; display: flex; gap: 12px; align-items: center; }
+        .feat-icon { width: 40px; height: 40px; border-radius: 8px; }
+        .feat-text h4 { font-size: 0.9rem; margin: 0; font-family: 'Google Sans'; }
+        .feat-text p { font-size: 0.75rem; color: var(--text-muted); margin: 0; }
+
+        /* --- APP LIST --- */
+        .section-title { padding: 0 16px; font-family: 'Google Sans'; font-size: 1.1rem; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .app-list { padding: 0 16px; }
+        .app-item { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; cursor: pointer; }
+        .app-icon { width: 60px; height: 60px; border-radius: 12px; object-fit: cover; box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
+        .app-meta { flex: 1; }
+        .app-name { font-size: 1rem; font-weight: 500; font-family: 'Google Sans'; margin-bottom: 3px; }
+        .app-dev { font-size: 0.8rem; color: var(--text-muted); }
+        .app-rating { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
+
+        /* --- OFFERS CARD (NEW) --- */
+        .offer-card { background: linear-gradient(135deg, #1e1f21, #2c2d30); border: 1px solid var(--border); border-radius: 16px; padding: 16px; margin-bottom: 15px; display: flex; align-items: center; gap: 15px; }
+        .offer-badge { background: #00897B; color: white; font-size: 0.7rem; padding: 4px 8px; border-radius: 4px; font-weight: bold; margin-bottom: 5px; display: inline-block; }
+
+        /* --- BOTTOM NAV --- */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 70px; background: var(--surface); border-top: 1px solid var(--border); display: flex; justify-content: space-around; align-items: center; z-index: 90; padding-bottom: 5px; }
+        .nav-btn { display: flex; flex-direction: column; align-items: center; gap: 4px; background: none; border: none; color: var(--text-muted); cursor: pointer; }
+        .nav-btn.active { color: var(--primary); }
+        .nav-btn svg { width: 24px; height: 24px; fill: currentColor; }
+        .nav-btn span { font-size: 0.75rem; font-weight: 500; }
+
+        /* --- MODALS & AUTH --- */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 2000; display: none; align-items: flex-end; backdrop-filter: blur(2px); }
+        .modal-sheet { background: var(--surface); width: 100%; height: 95vh; border-radius: 20px 20px 0 0; overflow-y: auto; animation: slideUp 0.3s; position: relative; }
+        @keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
+        
+        .detail-header { padding: 24px; display: flex; gap: 20px; }
+        .d-icon { width: 80px; height: 80px; border-radius: 16px; }
+        .d-info h1 { font-family: 'Google Sans'; font-size: 1.5rem; margin-bottom: 5px; }
+        .install-btn { background: var(--primary); color: #000; width: 100%; padding: 12px; border-radius: 50px; border: none; font-weight: 600; cursor: pointer; }
+        .desc-box { padding: 0 24px 40px; color: var(--text); font-size: 0.9rem; line-height: 1.5; }
+
+        #auth-overlay { position: fixed; inset: 0; background: var(--bg); z-index: 5000; display: flex; align-items: center; justify-content: center; }
+        .auth-box { background: var(--surface); padding: 30px; border-radius: 20px; width: 90%; max-width: 350px; text-align: center; border: 1px solid var(--border); }
+        .inp { width: 100%; padding: 12px; margin-bottom: 10px; background: var(--surface-light); border: 1px solid var(--border); color: white; border-radius: 8px; outline: none; }
+        .auth-btn-main { background: var(--primary); color: #000; width: 100%; padding: 12px; border-radius: 50px; border: none; font-weight: 600; cursor: pointer; }
+        
+        .profile-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 3000; display: none; align-items: center; justify-content: center; }
+        .p-box { background: var(--surface); padding: 20px; border-radius: 20px; width: 85%; max-width: 320px; text-align: center; }
+        .p-pic-lg { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid var(--surface-light); }
+    <!-- Play Store.html में detail modal के desc-box के बाद यह कोड एड करें -->
+<div class="desc-box" style="border-top: 1px solid var(--border); padding-top: 20px;">
+    <h3>APK Download</h3>
+    <div class="download-section" id="download-section">
+        <!-- डाउनलोड बटन यहाँ लोड होगा -->
+    </div>
+</div>
+
+<!-- नया स्टाइल एड करें -->
+<style>
+    /* APK Download Section */
+    .download-section {
+        background: var(--surface);
+        border-radius: 12px;
+        padding: 20px;
+        margin-top: 15px;
+        border: 1px solid var(--border);
+    }
+    
+    .download-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        background: linear-gradient(135deg, #4285F4, #34A853);
+        color: white;
+        border: none;
+        padding: 15px 25px;
+        border-radius: 12px;
+        font-weight: bold;
+        font-size: 1.1rem;
+        cursor: pointer;
+        width: 100%;
+        margin-bottom: 15px;
+        transition: transform 0.2s;
+    }
+    
+    .download-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(66, 133, 244, 0.3);
+    }
+    
+    .download-info {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        margin-top: 15px;
+    }
+    
+    .info-card {
+        background: var(--surface-light);
+        padding: 12px;
+        border-radius: 8px;
+        text-align: center;
+    }
+    
+    .info-label {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        margin-bottom: 5px;
+    }
+    
+    .info-value {
+        font-weight: bold;
+        font-size: 1rem;
+    }
+    
+    .security-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        background: #34A853;
+        color: white;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        margin-top: 10px;
+    }
+    
+    .stats-row {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        padding: 0 24px;
+        margin-bottom: 20px;
+    }
+    
+    .stat-box {
+        background: var(--surface-light);
+        padding: 15px;
+        border-radius: 10px;
+        text-align: center;
+    }
+    
+    .stat-val {
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: var(--primary);
+        margin-bottom: 5px;
+    }
+    
+    .stat-label {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+    }
+    
+    .install-container {
+        padding: 0 24px;
+        margin: 20px 0;
+    }
+    </style>
+</head>
+<body>
+
+    <!-- 1. AUTH SCREEN -->
+    <div id="auth-overlay">
+        <div class="auth-box">
+            <h2 style="font-family:'Google Sans'; margin-bottom:20px;">Google Play</h2>
+            
+            <div style="display:flex; gap:10px; justify-content:center; margin-bottom:20px;">
+                <button onclick="toggleAuth('login')" id="tab-login" style="background:none; border:none; color:var(--primary); font-weight:bold; border-bottom:2px solid var(--primary);">Login</button>
+                <button onclick="toggleAuth('signup')" id="tab-signup" style="background:none; border:none; color:var(--text-muted);">Sign Up</button>
+            </div>
+
+            <div id="form-login">
+                <input id="l-email" class="inp" placeholder="Email">
+                <button class="auth-btn-main" onclick="sendOTP('login')">Login</button>
+            </div>
+
+            <div id="form-signup" style="display:none;">
+                <input id="s-name" class="inp" placeholder="Full Name">
+                <input id="s-email" class="inp" placeholder="Email">
+                <button class="auth-btn-main" onclick="sendOTP('signup')">Create Account</button>
+            </div>
+
+            <div id="form-otp" style="display:none;">
+                <p style="color:var(--primary); margin-bottom:10px;">Enter OTP sent to email</p>
+                <input id="otp-inp" class="inp" type="number" placeholder="1234" style="text-align:center; letter-spacing:5px;">
+                <button class="auth-btn-main" onclick="verifyOTP()">Verify</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. MAIN APP -->
+    <div id="main-app" style="display:none;">
+        
+        <!-- Header -->
+        <header>
+            <div class="search-bar">
+                <svg class="search-icon" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+                <input type="text" class="search-inp" placeholder="Search apps & games" onkeyup="handleSearch(this.value)">
+                <svg class="search-icon" viewBox="0 0 24 24" style="margin-left:auto;"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
+            </div>
+            <div onclick="openProfile()">
+                <img id="header-pic" class="header-profile" src="" style="display:none;">
+                <div id="header-init" class="header-initial">U</div>
+            </div>
+        </header>
+
+        <!-- Tabs (Functional) -->
+        <div class="tabs">
+            <div class="tab active" onclick="filterTopTab('foryou', this)">For you</div>
+            <div class="tab" onclick="filterTopTab('top', this)">Top charts</div>
+            <div class="tab" onclick="filterTopTab('kids', this)">Kids</div>
+            <div class="tab" onclick="filterTopTab('premium', this)">Premium</div>
+        </div>
+
+        <!-- Featured Carousel -->
+        <div class="featured-scroll" id="featured-area">
+            <!-- Loading -->
+        </div>
+
+        <!-- App List -->
+        <div class="section-title">
+            <span id="section-header">Recommended for you</span>
+            <span class="arrow">&rarr;</span>
+        </div>
+        <div class="app-list" id="list-area">
+            <!-- Loading -->
+        </div>
+
+        <div style="height:20px;"></div>
+
+        <!-- Bottom Nav (Functional) -->
+        <div class="bottom-nav">
+            <button class="nav-btn active" onclick="switchNav('games', this)">
+                <svg viewBox="0 0 24 24"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H8v3H6v-3H3v-2h3V8h2v3h3v2zm4.5 2c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm4 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+                <span>Games</span>
+            </button>
+            <button class="nav-btn" onclick="switchNav('apps', this)">
+                <svg viewBox="0 0 24 24"><path d="M4 8h4V4H4v4zm6 12h4v-4h-4v4zm-6 0h4v-4H4v4zm0-6h4v-4H4v4zm6 0h4v-4h-4v4zm6-10v4h4V4h-4zm-6 4h4V4h-4v4zm6 6h4v-4h-4v4zm0 6h4v-4h-4v4z"/></svg>
+                <span>Apps</span>
+            </button>
+            <button class="nav-btn" onclick="switchNav('offers', this)">
+                <svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
+                <span>Offers</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- 3. DETAIL MODAL -->
+    <div class="modal-overlay" id="detail-modal">
+        <div class="modal-sheet">
+            <button onclick="closeDetail()" style="position:absolute; top:20px; right:20px; background:none; border:none; color:var(--text); font-size:24px;">&times;</button>
+            <div id="detail-content"></div>
+        </div>
+    </div>
+
+    <!-- 4. PROFILE MODAL -->
+    <div class="profile-modal" id="p-modal">
+        <div class="p-box">
+            <h3 style="color:var(--text); margin-bottom:15px;">Google Account</h3>
+            <div style="position:relative; display:inline-block; margin-bottom:10px;" onclick="document.getElementById('fileInp').click()">
+                <img id="p-pic-lg" class="p-pic-lg" src="">
+                <div style="position:absolute; bottom:0; right:0; background:var(--primary); border-radius:50%; padding:4px;">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="black"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+                </div>
+            </div>
+            <input type="file" id="fileInp" accept="image/*" style="display:none;" onchange="uploadPhoto(this)">
+            
+            <div id="p-name-disp" style="font-size:1.1rem; font-weight:bold;">User</div>
+            <div id="p-email-disp" style="font-size:0.9rem; color:var(--text-muted); margin-bottom:20px;">email@gmail.com</div>
+            
+            <button onclick="logout()" style="background:none; border:1px solid var(--border); color:var(--text); padding:8px 20px; border-radius:20px; font-size:0.9rem;">Sign out</button>
+            <button onclick="closeProfile()" style="background:none; border:none; color:var(--primary); margin-top:15px; display:block; width:100%;">Close</button>
+        </div>
+    </div>
+
+    <!-- FIREBASE & LOGIC -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+    <script>
+        // --- KEYS ---
+        const PUBLIC_KEY = "qent_4RrXPi5yV3YT";  
+        const SERVICE_ID = "service_3zaur0t";
+        const TEMPLATE_ID = "template_wwl69k9";
+        
+        (function(){ emailjs.init(PUBLIC_KEY); })();
+
+        // --- FIREBASE ---
+        const firebaseConfig = {
+  apiKey: "AIzaSyDfewnkWprnbp5ARsrUw4XbNLB1b4TaAY0",
+  authDomain: "story-cfa6a.firebaseapp.com",
+  databaseURL: "https://story-cfa6a-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "story-cfa6a",
+  storageBucket: "story-cfa6a.firebasestorage.app",
+  messagingSenderId: "70556479236",
+  appId: "1:70556479236:web:11c69767463e3171d4aa51",
+  measurementId: "G-P6HQP0KG5P"
+};
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // --- AUTO-LOGIN CHECK (FIRST THING ON PAGE LOAD) ---
+        window.onload = function() {
+            const storedUser = localStorage.getItem('playstore_user');
+            const storedEmail = localStorage.getItem('playstore_email');
+            const storedPic = localStorage.getItem('playstore_pic');
+            
+            if (storedUser && storedEmail) {
+                // Auto login with stored data
+                initApp(storedUser, storedEmail, storedPic, true);
+            }
+        };
+
+        // --- UPDATED DEFAULT APPS WITH CATEGORIES (GAME/APP) ---
+        const defaultApps = [
+            { id:'def1', name:'PUBG Mobile', dev:'Level Infinite', icon:'https://i.ibb.co/jShZJ4L/download.jpg', link:'#', desc:'Battle Royale mobile game.', downloads:'500M+', category:'Game' },
+            { id:'def2', name:'Free Fire MAX', dev:'Garena', icon:'https://i.ibb.co/SXW5DDhn/download-1.jpg', link:'#', desc:'Premium Battle Royale.', downloads:'100M+', category:'Game' },
+            { id:'def3', name:'Instagram', dev:'Instagram', icon:'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Instagram_logo_2016.svg/2048px-Instagram_logo_2016.svg.png', link:'#', desc:'Connect with friends.', downloads:'1B+', category:'App' },
+            { id:'def4', name:'WhatsApp', dev:'Meta', icon:'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/WhatsApp.svg/2044px-WhatsApp.svg.png', link:'#', desc:'Simple. Secure. Reliable.', downloads:'5B+', category:'App' },
+            { id:'def5', name:'YouTube', dev:'Google LLC', icon:'https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/YouTube_full-color_icon_%282017%29.svg/1024px-YouTube_full-color_icon_%282017%29.svg.png', link:'#', desc:'Watch videos.', downloads:'10B+', category:'App' },
+            { id:'def6', name:'Snapchat', dev:'Snap Inc', icon:'https://i.ibb.co/tMRT2Qg9/snapchat-logo-icon-181736.webp', link:'#', desc:'Share the moment.', downloads:'1B+', category:'App' },
+            { id:'def7', name:'Telegram', dev:'Telegram FZ-LLC', icon:'https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Telegram_logo.svg/2048px-Telegram_logo.svg.png', link:'#', desc:'Fast secure messaging.', downloads:'1B+', category:'App' },
+            { id:'def8', name:'Spotify', dev:'Spotify AB', icon:'https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Spotify_logo_without_text.svg/2048px-Spotify_logo_without_text.svg.png', link:'#', desc:'Music for everyone.', downloads:'1B+', category:'App' },
+            { id:'def9', name:'Subway Surfers', dev:'SYBO Games', icon:'https://i.ibb.co/RT9hHg1R/download-2.jpg', link:'#', desc:'Dash as fast as you can!', downloads:'1B+', category:'Game' },
+            { id:'def10', name:'Clash of Clans', dev:'Supercell', icon:'https://i.ibb.co/dJ2m9kDC/download-3.jpg', link:'#', desc:'Epic strategy game.', downloads:'500M+', category:'Game' }
+        ];
+
+        let generatedOTP = 0;
+        let currentUserEmail = "";
+        let authMode = 'login';
+        let allAppsList = [];
+        let currentView = 'games'; // Default view
+
+        // --- AUTH LOGIC ---
+        function toggleAuth(mode) {
+            authMode = mode;
+            document.getElementById('tab-login').style.borderBottom = mode==='login' ? '2px solid var(--primary)' : 'none';
+            document.getElementById('tab-login').style.color = mode==='login' ? 'var(--primary)' : 'var(--text-muted)';
+            document.getElementById('tab-signup').style.borderBottom = mode==='signup' ? '2px solid var(--primary)' : 'none';
+            document.getElementById('tab-signup').style.color = mode==='signup' ? 'var(--primary)' : 'var(--text-muted)';
+            
+            document.getElementById('form-login').style.display = mode==='login' ? 'block' : 'none';
+            document.getElementById('form-signup').style.display = mode==='signup' ? 'block' : 'none';
+        }
+
+        function sendOTP(mode) {
+            let email, name;
+            if(mode === 'login') {
+                email = document.getElementById('l-email').value;
+                name = "User";
+            } else {
+                email = document.getElementById('s-email').value;
+                name = document.getElementById('s-name').value;
+            }
+
+            if(!email.includes('@')) { alert("Invalid Email"); return; }
+            currentUserEmail = email;
+            if(mode === 'signup') localStorage.setItem('temp_name', name);
+
+            generatedOTP = Math.floor(1000 + Math.random() * 9000);
+
+            // Send Email
+            const params = { to_name: name, to_email: email, otp: generatedOTP };
+            
+            if(PUBLIC_KEY === "YOUR_PUBLIC_KEY") {
+                setTimeout(() => { alert("TEST OTP: " + generatedOTP); showOtp(); }, 1000);
+                return;
+            }
+
+            emailjs.send(SERVICE_ID, TEMPLATE_ID, params).then(() => {
+                alert("OTP Sent!"); showOtp();
+            });
+        }
+
+        function showOtp() {
+            document.getElementById('form-login').style.display = 'none';
+            document.getElementById('form-signup').style.display = 'none';
+            document.getElementById('form-otp').style.display = 'block';
+        }
+
+        function verifyOTP() {
+            if(document.getElementById('otp-inp').value == generatedOTP) {
+                const safeEmail = currentUserEmail.replace(/\./g, ',');
+                let finalName = localStorage.getItem('temp_name') || "User";
+                
+                if(authMode === 'signup') {
+                    db.ref('users/' + safeEmail).update({ 
+                        name: finalName, 
+                        email: currentUserEmail,
+                        created: new Date().toISOString(),
+                        session_token: generateSecureToken() // Security token
+                    });
+                } else {
+                    db.ref('users/' + safeEmail + '/name').once('value', s => {
+                        if(s.exists()) finalName = s.val();
+                        // Generate new session token on login
+                        db.ref('users/' + safeEmail).update({
+                            last_login: new Date().toISOString(),
+                            session_token: generateSecureToken()
+                        });
+                        initApp(finalName, currentUserEmail, null, false);
+                    });
+                    return;
+                }
+                initApp(finalName, currentUserEmail, null, false);
+            } else { 
+                alert("Wrong OTP"); 
+                // Security: Clear OTP after failed attempt
+                generatedOTP = 0;
+                document.getElementById('otp-inp').value = '';
+            }
+        }
+
+        // Generate secure random token for session
+        function generateSecureToken() {
+            return Array.from(crypto.getRandomValues(new Uint8Array(32)))
+                .map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        function initApp(name, email, pic = null, isAutoLogin = false) {
+            document.getElementById('auth-overlay').style.display = 'none';
+            document.getElementById('main-app').style.display = 'block';
+            
+            document.getElementById('header-init').innerText = name.charAt(0).toUpperCase();
+            document.getElementById('p-name-disp').innerText = name;
+            document.getElementById('p-email-disp').innerText = email;
+            
+            // Store session in localStorage (Auto-login)
+            localStorage.setItem('playstore_user', name);
+            localStorage.setItem('playstore_email', email);
+            if (pic) {
+                localStorage.setItem('playstore_pic', pic);
+                setPic(pic);
+            }
+            
+            // Set session expiry (7 days)
+            const expiryDate = new Date();
+            expiryDate.setDate(expiryDate.getDate() + 7);
+            localStorage.setItem('playstore_expiry', expiryDate.toISOString());
+            
+            if (!isAutoLogin) {
+                checkProfilePic();
+            } else {
+                // For auto-login, check if session expired
+                const expiry = localStorage.getItem('playstore_expiry');
+                if (expiry && new Date(expiry) < new Date()) {
+                    logout();
+                    alert("Session expired. Please login again.");
+                    return;
+                }
+                if (pic) {
+                    setPic(pic);
+                } else {
+                    checkProfilePic();
+                }
+            }
+            
+            loadApps();
+        }
+
+        // --- APP LOADING LOGIC ---
+        // --- APP LOADING LOGIC ---
+function loadApps() {
+    db.ref('apps').on('value', snap => {
+        const data = snap.val();
+        let firebaseApps = [];
+        if(data) {
+            // डेटा को ठीक से मैप करें
+            firebaseApps = Object.keys(data).map(k => {
+                let a = data[k];
+                // Debug के लिए console.log
+                console.log("Loading Firebase App:", a);
+                
+                return { 
+                    id: k, 
+                    name: a.name || 'Unknown App', 
+                    dev: a.developer || 'Unknown Developer', 
+                    icon: a.icon || 'https://via.placeholder.com/60', 
+                    link: a.downloadLink || '#', 
+                    desc: a.description || 'No description available.', 
+                    downloads: a.downloads || '1K+', 
+                    category: a.category || 'App'  // सही key का उपयोग करें
+                };
+            });
+            
+            // नए apps पहले दिखें (reverse array)
+            firebaseApps.reverse();
+        }
+        
+        // Debug के लिए
+        console.log("Firebase Apps Loaded:", firebaseApps.length);
+        console.log("Default Apps:", defaultApps.length);
+        
+        // Combine both lists
+        allAppsList = [...firebaseApps, ...defaultApps];
+        
+        // Debug
+        console.log("Total Apps:", allAppsList.length);
+        
+        // Initial Load: Show Games (Default)
+        switchNav('games', document.querySelector('.bottom-nav .nav-btn.active'));
+    }, (error) => {
+        console.error("Error loading apps:", error);
+        alert("Error loading apps: " + error.message);
+        
+        // Fallback: Use only default apps
+        allAppsList = [...defaultApps];
+        switchNav('games', document.querySelector('.bottom-nav .nav-btn.active'));
+    });
+}
+
+        // --- NEW: BOTTOM NAVIGATION LOGIC ---
+        function switchNav(type, btn) {
+            currentView = type;
+            
+            // Update Active State
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            if(btn) btn.classList.add('active');
+
+            const listArea = document.getElementById('list-area');
+            const featArea = document.getElementById('featured-area');
+            const headerTitle = document.getElementById('section-header');
+
+            listArea.innerHTML = "";
+            featArea.innerHTML = "";
+
+            if(type === 'offers') {
+                // OFFERS LOGIC
+                headerTitle.innerText = "Limited Time Deals";
+                
+                // Show some apps as 'Offers'
+                const offers = allAppsList.slice(0, 5); // Just taking first 5 for demo
+                offers.forEach(app => {
+                    listArea.innerHTML += `
+                    <div class="offer-card" onclick="openDetail('${app.id}')">
+                        <img src="${app.icon}" style="width:60px; height:60px; border-radius:12px;">
+                        <div style="flex:1;">
+                            <div class="offer-badge">80% OFF</div>
+                            <div style="font-weight:bold; font-size:1rem;">${app.name}</div>
+                            <div style="font-size:0.8rem; color:#9AA0A6;">Special Event Live!</div>
+                        </div>
+                        <button style="background:none; border:1px solid var(--border); color:var(--primary); padding:6px 15px; border-radius:20px;">View</button>
+                    </div>`;
+                });
+
+            } else {
+                // APPS OR GAMES LOGIC
+                let filtered = [];
+                if(type === 'games') {
+                    headerTitle.innerText = "Recommended Games";
+                    filtered = allAppsList.filter(a => a.category === 'Game');
+                } else {
+                    headerTitle.innerText = "Recommended Apps";
+                    filtered = allAppsList.filter(a => a.category !== 'Game'); // Show Apps
+                }
+
+                // Render Featured (Top 3)
+                filtered.slice(0, 3).forEach(app => {
+                    featArea.innerHTML += `
+                    <div class="feat-card" onclick="openDetail('${app.id}')">
+                        <img src="${app.icon}" class="feat-img" style="filter: brightness(0.6);">
+                        <div class="feat-info">
+                            <img src="${app.icon}" class="feat-icon">
+                            <div class="feat-text"><h4>${app.name}</h4><p>${app.dev}</p></div>
+                        </div>
+                    </div>`;
+                });
+
+                // Render List
+                filtered.forEach(app => {
+                    listArea.innerHTML += `
+                    <div class="app-item" onclick="openDetail('${app.id}')">
+                        <img src="${app.icon}" class="app-icon">
+                        <div class="app-meta">
+                            <div class="app-name">${app.name}</div>
+                            <div class="app-dev">${app.dev}</div>
+                            <div class="app-rating">4.5 ★ • ${app.downloads}</div>
+                        </div>
+                    </div>`;
+                });
+            }
+        }
+
+        // --- NEW: TOP TAB LOGIC ---
+        function filterTopTab(filter, el) {
+            // UI Update
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            el.classList.add('active');
+
+            const listArea = document.getElementById('list-area');
+            listArea.innerHTML = "";
+
+            let sortedList = [...allAppsList];
+
+            if(filter === 'top') {
+                // Sort by downloads (simple logic for demo)
+                sortedList.sort(() => Math.random() - 0.5); 
+                document.getElementById('section-header').innerText = "Top Charts";
+            } else if (filter === 'kids') {
+                // Filter for 'Game' only for kids demo
+                sortedList = sortedList.filter(a => a.category === 'Game');
+                document.getElementById('section-header').innerText = "Approved for Kids";
+            } else {
+                document.getElementById('section-header').innerText = "Recommended for you";
+            }
+
+            // Render
+            sortedList.forEach(app => {
+                listArea.innerHTML += `
+                <div class="app-item" onclick="openDetail('${app.id}')">
+                    <img src="${app.icon}" class="app-icon">
+                    <div class="app-meta">
+                        <div class="app-name">${app.name}</div>
+                        <div class="app-dev">${app.dev}</div>
+                        <div class="app-rating">4.5 ★ • ${app.downloads}</div>
+                    </div>
+                </div>`;
+            });
+        }
+
+        function handleSearch(q) {
+            q = q.toLowerCase();
+            const listArea = document.getElementById('list-area');
+            listArea.innerHTML = "";
+            
+            const filtered = allAppsList.filter(a => a.name.toLowerCase().includes(q));
+            
+            filtered.forEach(app => {
+                listArea.innerHTML += `
+                <div class="app-item" onclick="openDetail('${app.id}')">
+                    <img src="${app.icon}" class="app-icon">
+                    <div class="app-meta">
+                        <div class="app-name">${app.name}</div>
+                        <div class="app-dev">${app.dev}</div>
+                    </div>
+                </div>`;
+            });
+        }
+
+        // --- DETAILS MODAL ---
+        function openDetail(id) {
+            const app = allAppsList.find(a => a.id === id);
+            const modal = document.getElementById('detail-content');
+            
+            modal.innerHTML = `
+                <div class="detail-header">
+                    <img src="${app.icon}" class="d-icon">
+                    <div class="d-info">
+                        <h1>${app.name}</h1>
+                        <p>${app.dev}</p>
+                        <div style="font-size:0.8rem; color:#9AA0A6; margin-top:5px;">Contains ads • In-app purchases</div>
+                    </div>
+                </div>
+                <div class="stats-row">
+                    <div class="stat-box"><div class="stat-val">4.5 ★</div><div class="stat-label">98K reviews</div></div>
+                    <div class="stat-box"><div class="stat-val">${app.downloads}</div><div class="stat-label">Downloads</div></div>
+                    <div class="stat-box"><div class="stat-val">12+</div><div class="stat-label">Rated for 12+</div></div>
+                </div>
+                <div class="install-container">
+                    <button class="install-btn" onclick="window.location.href='${app.link}'">Install</button>
+                </div>
+                <div class="desc-box">
+                    <h3>About this app</h3>
+                    <p>${app.desc}</p>
+                </div>
+            `;
+            document.getElementById('detail-modal').style.display = 'flex';
+        }
+        function closeDetail() { document.getElementById('detail-modal').style.display = 'none'; }
+
+        // --- PROFILE PIC ---
+        function uploadPhoto(input) {
+            const file = input.files[0];
+            if(file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const base64 = e.target.result;
+                    setPic(base64);
+                    const safeEmail = currentUserEmail.replace(/\./g, ',');
+                    db.ref('users/' + safeEmail + '/pic').set(base64);
+                    // Update localStorage for auto-login
+                    localStorage.setItem('playstore_pic', base64);
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+        function checkProfilePic() {
+            const safeEmail = currentUserEmail.replace(/\./g, ',');
+            db.ref('users/' + safeEmail + '/pic').once('value', snap => {
+                if(snap.exists()) {
+                    const pic = snap.val();
+                    setPic(pic);
+                    localStorage.setItem('playstore_pic', pic);
+                }
+            });
+        }
+        function setPic(src) {
+            document.getElementById('header-init').style.display = 'none';
+            const img = document.getElementById('header-pic');
+            img.src = src; img.style.display = 'block';
+            document.getElementById('p-pic-lg').src = src;
+        }
+
+        // --- NAV ---
+        function openProfile() { 
+            // Security: Check if user is still logged in
+            const expiry = localStorage.getItem('playstore_expiry');
+            if (expiry && new Date(expiry) < new Date()) {
+                logout();
+                alert("Session expired. Please login again.");
+                return;
+            }
+            document.getElementById('p-modal').style.display='flex'; 
+        }
+        function closeProfile() { document.getElementById('p-modal').style.display='none'; }
+        
+        function logout() {
+            // Clear all localStorage data
+            localStorage.removeItem('playstore_user');
+            localStorage.removeItem('playstore_email');
+            localStorage.removeItem('playstore_pic');
+            localStorage.removeItem('playstore_expiry');
+            
+            // Clear session data from Firebase
+            if (currentUserEmail) {
+                const safeEmail = currentUserEmail.replace(/\./g, ',');
+                db.ref('users/' + safeEmail + '/session_token').remove();
+            }
+            
+            // Reload page to show login screen
+            location.reload();
+        }
+
+        // Security: Clear OTP after 10 minutes
+        setTimeout(() => {
+            if (generatedOTP !== 0) {
+                generatedOTP = 0;
+                console.log("OTP expired for security");
+            }
+        }, 10 * 60 * 1000);
+
+    </script>
+</body>
+</html>
